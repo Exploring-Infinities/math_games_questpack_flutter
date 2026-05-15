@@ -41,20 +41,16 @@ Future<void> pushMathGamesRoute(
   BuildContext context,
   String routeName,
 ) async {
-  final navigator = Navigator.of(context);
-  try {
-    await navigator.pushNamed(routeName);
-    return;
-  } catch (_) {
-    final builder = mathGamesRouteBuilder(routeName);
-    if (builder == null) rethrow;
-    await navigator.push(
-      MaterialPageRoute<void>(
-        settings: RouteSettings(name: routeName),
-        builder: builder,
-      ),
-    );
+  final builder = mathGamesRouteBuilder(routeName);
+  if (builder == null) {
+    throw ArgumentError('Unknown math-games route: $routeName');
   }
+  await Navigator.of(context).push(
+    MaterialPageRoute<void>(
+      settings: RouteSettings(name: routeName),
+      builder: builder,
+    ),
+  );
 }
 
 Future<void> goToMathGamesHome(BuildContext context) async {
