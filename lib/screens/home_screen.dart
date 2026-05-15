@@ -32,12 +32,8 @@ class _HomeScreenState extends State<HomeScreen> {
     BuildContext context, {
     required String title,
     required String subtitle,
+    required List<String> tips,
   }) async {
-    final tips = [
-      'Read the target before acting.',
-      'Move with intention, not speed.',
-      'Use retries to learn the pattern.',
-    ];
     await showDialog<void>(
       context: context,
       barrierColor: Colors.black.withValues(alpha: 0.82),
@@ -104,7 +100,12 @@ class _HomeScreenState extends State<HomeScreen> {
     BuildContext context, {
     required String title,
     required String routeName,
+    required String category,
     required String subtitle,
+    required String description,
+    required String rightStatLabel,
+    required String rightStatValue,
+    required List<String> howToTips,
   }) async {
     final level = _gameLevelFor(title);
     final accent = const Color(0xFF88FFC0);
@@ -139,7 +140,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               const SizedBox(height: 10),
               Text(
-                subtitle.toUpperCase(),
+                category.toUpperCase(),
                 style: TextStyle(
                   color: Colors.white.withValues(alpha: 0.22),
                   letterSpacing: 1.3,
@@ -157,7 +158,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               const SizedBox(height: 6),
               Text(
-                'Memorize the cards. Solve the equation. Tap the right one before your memory fades.',
+                description,
                 style: TextStyle(
                   color: Colors.white.withValues(alpha: 0.5),
                   fontSize: 12,
@@ -213,7 +214,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Text(
-                          'CARDS',
+                          rightStatLabel.toUpperCase(),
                           style: TextStyle(
                             color: Colors.white.withValues(alpha: 0.3),
                             fontSize: 8,
@@ -221,7 +222,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
                         Text(
-                          '${(4 + (level ~/ 3)).clamp(4, 8)}',
+                          rightStatValue,
                           style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w900),
                         ),
                       ],
@@ -254,7 +255,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 width: double.infinity,
                 child: OutlinedButton(
                   onPressed: () async {
-                    await _showHowToDialog(context, title: title, subtitle: subtitle);
+                    await _showHowToDialog(
+                      context,
+                      title: title,
+                      subtitle: subtitle,
+                      tips: howToTips,
+                    );
                   },
                   style: OutlinedButton.styleFrom(
                     side: BorderSide(color: Colors.white.withValues(alpha: 0.14)),
@@ -282,47 +288,120 @@ class _HomeScreenState extends State<HomeScreen> {
     final level = calcLevelFromTotal(prefs.totalCorrect);
     final accent = const Color(0xFF88FFC0);
 
-    final games = <({String title, String routeName, String subtitle, IconData icon})>[
+    final games = <({
+      String title,
+      String routeName,
+      String subtitle,
+      String category,
+      String description,
+      String rightStatLabel,
+      String Function(int level) rightStatValue,
+      List<String> howToTips,
+      IconData icon
+    })>[
       (
         title: 'Equation Balance',
         routeName: GameRouteNames.equationBalance,
         subtitle: 'Balance the scale',
+        category: 'Arithmetic',
+        description: 'Balance both sides, answer quickly, and keep your streak alive.',
+        rightStatLabel: 'QUEST',
+        rightStatValue: (_) => '10',
+        howToTips: const [
+          'Read both sides before typing.',
+          'Use check and retry to keep streaks alive.',
+          'Accuracy matters more than speed spikes.',
+        ],
         icon: Icons.balance
       ),
       (
         title: 'Number Ninja',
         routeName: GameRouteNames.numberNinja,
         subtitle: 'Speed & slicing',
+        category: 'Arcade',
+        description: 'Slice only expressions that match the target. Wrong cuts cost time.',
+        rightStatLabel: 'TIME',
+        rightStatValue: (_) => '60',
+        howToTips: const [
+          'Match expressions to the shown target.',
+          'Avoid wrong slices to protect your timer.',
+          'Build clean streaks before chasing speed.',
+        ],
         icon: Icons.flash_on
       ),
       (
         title: 'Flip Quest',
         routeName: GameRouteNames.flipQuest,
         subtitle: 'Memory + math',
+        category: 'Memory · Math',
+        description: 'Memorize cards, solve the equation, then tap the hidden answer.',
+        rightStatLabel: 'CARDS',
+        rightStatValue: (gameLevel) => '${(4 + (gameLevel ~/ 3)).clamp(4, 8)}',
+        howToTips: const [
+          'Memorize numbers during reveal time.',
+          'Solve first, then tap confidently.',
+          'Chain correct picks to boost score.',
+        ],
         icon: Icons.flip
       ),
       (
         title: 'Math Tetris',
         routeName: GameRouteNames.mathTetris,
         subtitle: 'Stack & solve',
+        category: 'Numbers · Puzzle',
+        description: 'Drop blocks to match each row target exactly and clear lines.',
+        rightStatLabel: 'ROWS',
+        rightStatValue: (_) => '8',
+        howToTips: const [
+          'Aim for exact row totals, not near misses.',
+          'Use side movement before hard drop.',
+          'Watch target labels every turn.',
+        ],
         icon: Icons.grid_view
       ),
       (
         title: 'Number Merge',
         routeName: GameRouteNames.numberMerge,
         subtitle: 'Reach the target',
+        category: 'Merge · Math',
+        description: 'Swipe to merge tiles with +, −, and × to hit the target exactly.',
+        rightStatLabel: 'GRID',
+        rightStatValue: (_) => '4×4',
+        howToTips: const [
+          'Plan merges before committing a swipe.',
+          'Operation signs matter as much as values.',
+          'Use retries to discover optimal paths.',
+        ],
         icon: Icons.merge_type
       ),
       (
         title: 'Math Golf',
         routeName: GameRouteNames.mathGolf,
         subtitle: 'Angles & power',
+        category: 'Physics · Math',
+        description: 'Solve x and y, then shoot with the right power and angle.',
+        rightStatLabel: 'PAR',
+        rightStatValue: (gameLevel) => '${(1 + (gameLevel ~/ 4)).clamp(1, 3)}',
+        howToTips: const [
+          'x controls power, y controls angle.',
+          'Adjust both values after every miss.',
+          'Stay under max strokes to clear the hole.',
+        ],
         icon: Icons.sports_golf
       ),
       (
         title: 'Number Crush',
         routeName: GameRouteNames.numberCrush,
         subtitle: 'Merge to target',
+        category: 'Merge · Puzzle',
+        description: 'Chain smart number picks to reach the target without dead ends.',
+        rightStatLabel: 'TARGET',
+        rightStatValue: (_) => '10',
+        howToTips: const [
+          'Prioritize chains that keep future options open.',
+          'Use operation color cues while planning.',
+          'Reset fast when the board is trapped.',
+        ],
         icon: Icons.auto_awesome
       ),
     ];
@@ -383,7 +462,12 @@ class _HomeScreenState extends State<HomeScreen> {
                           context,
                           title: g.title,
                           routeName: g.routeName,
+                          category: g.category,
                           subtitle: g.subtitle,
+                          description: g.description,
+                          rightStatLabel: g.rightStatLabel,
+                          rightStatValue: g.rightStatValue(_gameLevelFor(g.title)),
+                          howToTips: g.howToTips,
                         ),
                         borderRadius: BorderRadius.circular(16),
                         child: Container(

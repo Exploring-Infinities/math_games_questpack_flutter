@@ -45,13 +45,17 @@ class _MathTetrisScreenState extends State<MathTetrisScreen> {
   }
 
   void _startGame() {
+    _secTick?.cancel();
+    _dropTick?.cancel();
+    _done = false;
+    _score = 0;
+    _secs = 45;
+    _level = 1;
+    _clearedRows = 0;
     _grid = List.generate(_rows, (_) => List<int?>.filled(_cols, null));
     _targets = _makeTargets(_level);
     _nextValue = _randVal(_level);
     _spawnBlock();
-
-    _secTick?.cancel();
-    _dropTick?.cancel();
 
     _secTick = Timer.periodic(const Duration(seconds: 1), (_) {
       if (!mounted || _done) return;
@@ -182,6 +186,111 @@ class _MathTetrisScreenState extends State<MathTetrisScreen> {
     await GamePrefs.instance.saveTetrisBestIfHigher(_score);
     await PlantService.markActivityDone();
     if (!mounted) return;
+    final playAgain = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Colors.black.withValues(alpha: 0.86),
+      builder: (ctx) => Dialog(
+        backgroundColor: const Color(0xFF0A0A0A),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(18),
+          side: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(18, 18, 18, 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Puzzle Complete',
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.32),
+                  fontSize: 10,
+                  letterSpacing: 2.4,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'Math Tetris',
+                style: TextStyle(fontSize: 28, fontWeight: FontWeight.w900),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                '$_score',
+                style: const TextStyle(
+                  color: Color(0xFF88FFC0),
+                  fontSize: 56,
+                  fontWeight: FontWeight.w900,
+                  height: 1,
+                ),
+              ),
+              Text(
+                'FINAL SCORE',
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.28),
+                  fontSize: 10,
+                  letterSpacing: 1.4,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 14),
+              Row(
+                children: [
+                  Expanded(
+                    child: _EndStatCard(
+                      label: 'LEVEL',
+                      value: '$_level',
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: _EndStatCard(
+                      label: 'ROWS CLEARED',
+                      value: '$_clearedRows',
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 14),
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton(
+                  onPressed: () => Navigator.pop(ctx, true),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: const Color(0xFF88FFC0),
+                    foregroundColor: Colors.black,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                  ),
+                  child: const Text(
+                    'PLAY AGAIN',
+                    style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 0.9),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton(
+                  onPressed: () => Navigator.pop(ctx, false),
+                  style: OutlinedButton.styleFrom(
+                    side: BorderSide(color: Colors.white.withValues(alpha: 0.18)),
+                    foregroundColor: Colors.white.withValues(alpha: 0.65),
+                    padding: const EdgeInsets.symmetric(vertical: 13),
+                  ),
+                  child: const Text('Home'),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+    if (!mounted) return;
+    if (playAgain == true) {
+      setState(_startGame);
+      return;
+    }
     context.goNamed(GameRouteNames.home);
   }
 
@@ -481,6 +590,46 @@ class _MathTetrisScreenState extends State<MathTetrisScreen> {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _EndStatCard extends StatelessWidget {
+  const _EndStatCard({
+    required this.label,
+    required this.value,
+  });
+
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+      decoration: BoxDecoration(
+        color: const Color(0xFF111111),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+      ),
+      child: Column(
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.25),
+              fontSize: 8,
+              letterSpacing: 1.2,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 3),
+          Text(
+            value,
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
+          ),
+        ],
       ),
     );
   }

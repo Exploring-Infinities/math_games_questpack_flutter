@@ -41,6 +41,20 @@ class _NumberNinjaScreenState extends State<NumberNinjaScreen> {
   @override
   void initState() {
     super.initState();
+    _startSession();
+  }
+
+  void _startSession() {
+    _secTimer?.cancel();
+    _frameTimer?.cancel();
+    setState(() {
+      _secs = _gameSecs;
+      _score = 0;
+      _wrongSlices = 0;
+      _ended = false;
+      _orbs.clear();
+      _slashTrail.clear();
+    });
     _newTargetRound();
     _secTimer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (!mounted) return;
@@ -171,17 +185,112 @@ class _NumberNinjaScreenState extends State<NumberNinjaScreen> {
     await GamePrefs.instance.addNinjaCorrect(_score);
     await PlantService.markActivityDone();
     if (!mounted) return;
-    await showDialog<void>(
+    final playAgain = await showDialog<bool>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Time up'),
-        content: Text('Score: $_score'),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('OK')),
-        ],
+      barrierDismissible: false,
+      barrierColor: Colors.black.withValues(alpha: 0.86),
+      builder: (ctx) => Dialog(
+        backgroundColor: const Color(0xFF0A0A0A),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(18),
+          side: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(18, 18, 18, 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Quest Complete',
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.32),
+                  fontSize: 10,
+                  letterSpacing: 2.4,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'Number Ninja',
+                style: TextStyle(fontSize: 28, fontWeight: FontWeight.w900),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                '$_score',
+                style: const TextStyle(
+                  color: Color(0xFF88FFC0),
+                  fontSize: 56,
+                  fontWeight: FontWeight.w900,
+                  height: 1,
+                ),
+              ),
+              Text(
+                'FINAL SCORE',
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.28),
+                  fontSize: 10,
+                  letterSpacing: 1.4,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 14),
+              Row(
+                children: [
+                  Expanded(
+                    child: _EndStatCard(
+                      label: 'TARGETS HIT',
+                      value: '$_score',
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: _EndStatCard(
+                      label: 'WRONG CUTS',
+                      value: '$_wrongSlices',
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 14),
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton(
+                  onPressed: () => Navigator.pop(ctx, true),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: const Color(0xFF88FFC0),
+                    foregroundColor: Colors.black,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                  ),
+                  child: const Text(
+                    'PLAY AGAIN',
+                    style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 0.9),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton(
+                  onPressed: () => Navigator.pop(ctx, false),
+                  style: OutlinedButton.styleFrom(
+                    side: BorderSide(color: Colors.white.withValues(alpha: 0.18)),
+                    foregroundColor: Colors.white.withValues(alpha: 0.65),
+                    padding: const EdgeInsets.symmetric(vertical: 13),
+                  ),
+                  child: const Text('Home'),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
-    if (mounted) context.goNamed(GameRouteNames.home);
+    if (!mounted) return;
+    if (playAgain == true) {
+      _startSession();
+      return;
+    }
+    context.goNamed(GameRouteNames.home);
   }
 
   void _slashBySegment(Offset a, Offset b) {
@@ -383,6 +492,46 @@ class _NumberNinjaScreenState extends State<NumberNinjaScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _EndStatCard extends StatelessWidget {
+  const _EndStatCard({
+    required this.label,
+    required this.value,
+  });
+
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+      decoration: BoxDecoration(
+        color: const Color(0xFF111111),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+      ),
+      child: Column(
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.25),
+              fontSize: 8,
+              letterSpacing: 1.2,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 3),
+          Text(
+            value,
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
+          ),
+        ],
       ),
     );
   }
