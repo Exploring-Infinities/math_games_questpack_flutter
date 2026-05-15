@@ -9,7 +9,13 @@ import '../services/plant_service.dart';
 import '../games/equation/equation_math.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  const HomeScreen({
+    super.key,
+    this.bottomPadding = 96,
+  });
+
+  /// Extra bottom spacing for host apps that render persistent bottom bars.
+  final double bottomPadding;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -289,6 +295,8 @@ class _HomeScreenState extends State<HomeScreen> {
     final plant = PlantService.getPlantData();
     final level = calcLevelFromTotal(prefs.totalCorrect);
     final accent = const Color(0xFF88FFC0);
+    final resolvedBottomPadding =
+        widget.bottomPadding < 24 ? 24.0 : widget.bottomPadding;
 
     final games = <({
       String title,
@@ -445,7 +453,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             SliverPadding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+              padding: EdgeInsets.fromLTRB(16, 16, 16, resolvedBottomPadding),
               sliver: SliverGrid(
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
