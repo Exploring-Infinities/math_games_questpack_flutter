@@ -3,9 +3,8 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:go_router/go_router.dart';
 
-import '../router/route_names.dart';
+import '../router/app_router.dart';
 import '../services/plant_service.dart';
 import '../storage/game_prefs.dart';
 
@@ -291,7 +290,7 @@ class _MathTetrisScreenState extends State<MathTetrisScreen> {
       setState(_startGame);
       return;
     }
-    context.goNamed(GameRouteNames.home);
+    await goToMathGamesHome(context);
   }
 
   void _moveLeft() {

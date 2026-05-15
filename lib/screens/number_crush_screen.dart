@@ -2,9 +2,8 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
-import '../router/route_names.dart';
+import '../router/app_router.dart';
 import '../services/plant_service.dart';
 import '../storage/game_prefs.dart';
 
@@ -257,7 +256,7 @@ class _NumberCrushScreenState extends State<NumberCrushScreen> {
       setState(() => _level = next);
       _resetLevel(_level);
     } else {
-      context.goNamed(GameRouteNames.home);
+      await goToMathGamesHome(context);
     }
   }
 
@@ -867,7 +866,7 @@ class _NumberCrushScreenState extends State<NumberCrushScreen> {
                     ),
                     if (!win)
                       OutlinedButton(
-                        onPressed: () => context.goNamed(GameRouteNames.home),
+                        onPressed: () => unawaited(goToMathGamesHome(context)),
                         style: OutlinedButton.styleFrom(
                           foregroundColor: Colors.white.withValues(alpha: 0.45),
                           side: BorderSide(color: Colors.white.withValues(alpha: 0.2), width: 2),

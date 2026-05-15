@@ -2,9 +2,8 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
-import '../router/route_names.dart';
+import '../router/app_router.dart';
 import '../services/plant_service.dart';
 import '../storage/game_prefs.dart';
 
@@ -262,9 +261,9 @@ class _FlipQuestScreenState extends State<FlipQuestScreen> {
     await GamePrefs.instance.addTimePlayed(elapsed);
   }
 
-  void _toHome() {
+  Future<void> _toHome() async {
     _clearTimers();
-    context.goNamed(GameRouteNames.home);
+    await goToMathGamesHome(context);
   }
 
   Future<void> _showHowTo() async {

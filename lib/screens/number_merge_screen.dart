@@ -2,9 +2,8 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
-import '../router/route_names.dart';
+import '../router/app_router.dart';
 import '../services/plant_service.dart';
 
 const _size = 4;
@@ -710,7 +709,7 @@ class _NumberMergeScreenState extends State<NumberMergeScreen> {
                       _miniStat('Level', '${_level + 1}/${_levels.length}', Colors.white70),
                       const SizedBox(width: 10),
                       IconButton(
-                        onPressed: () => context.goNamed(GameRouteNames.home),
+                        onPressed: () => unawaited(goToMathGamesHome(context)),
                         icon: const Icon(Icons.close),
                         color: Colors.white54,
                       ),

@@ -2,9 +2,8 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
-import '../../router/route_names.dart';
+import '../../router/app_router.dart';
 import '../../games/equation/equation_math.dart';
 import '../../models/lb_entry.dart';
 import '../../services/leaderboard_service.dart';
@@ -377,7 +376,7 @@ class _EquationBalanceScreenState extends State<EquationBalanceScreen>
                 _EndView(
                   stats: _endStats!,
                   onPlayAgain: _playAgain,
-                  onHome: () => context.goNamed(GameRouteNames.home),
+                  onHome: () => unawaited(goToMathGamesHome(context)),
                   accent: accent,
                 ),
               if (_showInfo)
@@ -495,7 +494,7 @@ class _EquationBalanceScreenState extends State<EquationBalanceScreen>
                 Align(
                   alignment: Alignment.centerLeft,
                   child: IconButton(
-                    onPressed: () => context.goNamed(GameRouteNames.home),
+                    onPressed: () => unawaited(goToMathGamesHome(context)),
                     icon: Icon(Icons.arrow_back,
                         color: Colors.white.withValues(alpha: 0.4)),
                   ),

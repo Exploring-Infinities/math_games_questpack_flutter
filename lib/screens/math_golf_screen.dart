@@ -2,9 +2,8 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
-import '../router/route_names.dart';
+import '../router/app_router.dart';
 import '../services/plant_service.dart';
 
 class MathGolfScreen extends StatefulWidget {
@@ -320,7 +319,7 @@ class _MathGolfScreenState extends State<MathGolfScreen> {
   Future<void> _onDoneAllLevels() async {
     await PlantService.markActivityDone();
     if (!mounted) return;
-    context.goNamed(GameRouteNames.home);
+    await goToMathGamesHome(context);
   }
 
   InlineSpan _equationSpan(String eq) {
@@ -655,7 +654,7 @@ class _MathGolfScreenState extends State<MathGolfScreen> {
         _OverlayAction(
           label: 'Home',
           color: const Color(0xFFFFE066),
-          onTap: () => context.goNamed(GameRouteNames.home),
+          onTap: () => unawaited(goToMathGamesHome(context)),
         ),
       ],
     );

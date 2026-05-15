@@ -1,13 +1,18 @@
 library math_games_questpack_flutter;
 
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 import 'router/app_router.dart';
+import 'router/route_names.dart';
 import 'storage/game_prefs.dart';
 import 'theme/app_theme.dart';
 
-export 'router/app_router.dart' show createAppRouter, createMathGamesRoutes;
+export 'router/app_router.dart'
+    show
+        createMathGamesOnGenerateRoute,
+        createMathGamesRoutes,
+        goToMathGamesHome,
+        pushMathGamesRoute;
 export 'router/route_names.dart';
 
 class MathGamesQuestpack {
@@ -15,27 +20,24 @@ class MathGamesQuestpack {
 
   static Future<void> init() => GamePrefs.init();
 
-  static List<RouteBase> routes({String basePath = ''}) =>
-      createMathGamesRoutes(basePath: basePath);
+  static Map<String, WidgetBuilder> routes() => createMathGamesRoutes();
 }
 
 class MathGamesQuestpackApp extends StatelessWidget {
   const MathGamesQuestpackApp({
     super.key,
     this.title = 'Math Games',
-    this.basePath = '',
   });
 
   final String title;
-  final String basePath;
 
   @override
   Widget build(BuildContext context) {
-    final router = createAppRouter(basePath: basePath);
-    return MaterialApp.router(
+    return MaterialApp(
       title: title,
       theme: buildAppTheme(),
-      routerConfig: router,
+      initialRoute: GameRouteNames.home,
+      routes: createMathGamesRoutes(),
       debugShowCheckedModeBanner: false,
     );
   }

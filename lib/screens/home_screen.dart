@@ -1,6 +1,8 @@
-import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import 'dart:async';
 
+import 'package:flutter/material.dart';
+
+import '../router/app_router.dart';
 import '../router/route_names.dart';
 import '../storage/game_prefs.dart';
 import '../services/plant_service.dart';
@@ -236,7 +238,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: FilledButton(
                   onPressed: () {
                     Navigator.pop(ctx);
-                    context.pushNamed(routeName);
+                    unawaited(pushMathGamesRoute(context, routeName));
                   },
                   style: FilledButton.styleFrom(
                     backgroundColor: accent,
